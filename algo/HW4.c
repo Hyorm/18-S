@@ -17,12 +17,14 @@ vertex* createV(int value);
 vertex* makeEdge(vertex* src, int num);
 void printVertexs(vertex* src);
 void dfs_visit(vertex* src);
+void dfs_visit_trs(vertex* src);
+void findSCC(int num);
 
 static vertex** adjList = 0x0;
 static vertex** trsList = NULL;
 
 int time = 0;
-
+int trsTime = 0;
 int main(){
 
 	char alpha[26] ={'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
@@ -89,10 +91,12 @@ int main(){
 	}
 
 	//1) result
+        printf("\n"); 
 	printf("1) Array of adjacency list of above graph\n");
 	for(int i = 0; i< num; i++)
 		printVertexs(adjList[i]);
-	
+
+	printf("\n");	
 	//TODO: 2) Discovery time and finish time of each vertex after step1 
 	for(int i = 0; i< num; i++)
 		if(strcmp(adjList[i]->color, "white")==0)dfs_visit(adjList[i]);
@@ -103,7 +107,7 @@ int main(){
                 printf("%c: Discovery Time - %d, Finish Time - %d\n", alpha[adjList[i]->value],adjList[i]->discoveryTime, adjList[i]->finishTime);
 
 	}
-
+        printf("\n"); 
 	//TODO: 3) Array of adjacency list of transpose graph after step2
 
 	for(int i = 0; i< num; i++){
@@ -134,23 +138,27 @@ int main(){
                 if(first == 0)trsList[i] = createV(i);
                 else trsList[i] = makeEdge(trsList[i], i);
         }
-
 	// 3) result
 	printf("3) Array of adjacency list of transpose graph after step2\n");
 	for(int i = 0; i< num; i++)
                 printVertexs(trsList[i]);
-
+        printf("\n");  
 	//TODO: 4) Discovery time and finish time of each vertex after step3 
-	
+	for(int i = 0; i< num; i++)
+                if(strcmp(trsList[i]->color, "white")==0)dfs_visit_trs(trsList[i]);	
+
 	// 4) result
 	printf("4) Discovery time and finish time of each vertex after step3\n");
-
+	for(int i = 0; i< num; i++){
+                printf("%c: Discovery Time - %d, Finish Time - %d\n", alpha[trsList[i]->value],trsList[i]->discoveryTime, trsList[i]->finishTime);
+	}
+        printf("\n"); 
 	//TODO: 5) SCC result
 
 	// 5) result
 	printf("5) SCC result\n");
 	
-	
+	findSCC(num);
 }
 
 vertex* createV(int value){
@@ -203,4 +211,46 @@ void dfs_visit(vertex* src){
 	adjList[src->value]->finishTime = time++;
 	//printf("fin: %d -> %d \n", adjList[src->value]->value, time);
 	
+}
+void dfs_visit_trs(vertex* src){
+
+        vertex * v;
+
+        trsList[src->value]->color = "gray";
+        trsList[src->value]->discoveryTime = trsTime++;
+	//printf("dis: %d -> %d \n", trsList[src->value]->value, trsTime);
+
+        for (v = src ; v != NULL ; v = v->next){
+                if(strcmp(trsList[v->value]->color, "white")==0){
+                        trsList[v->value]->parent = src;
+                        dfs_visit_trs(trsList[v->value]);
+                }
+        }
+        trsList[src->value]->color = "black";
+        trsList[src->value]->finishTime = trsTime++;
+        //printf("fin: %d -> %d \n", trsList[src->value]->value, trsTime);
+
+}
+void findSCC(int num){
+	char alpha[26] ={'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+	int sccNum = 1;
+	int k, a, s = -1;
+	for(k = 0; k < num; k++){
+		int fir = 0;
+		for(a = 0; a < num; a++){
+			if(trsList[k]->value != trsList[a]->value){
+				if((trsList[k]->finishTime > trsList[a]->finishTime)&&(trsList[k]->discoveryTime < trsList[a]->discoveryTime)){
+					if(fir++==0)printf("SCC%d: vertex %c", sccNum++, alpha[k]);
+					printf(", %c", alpha[a]);
+					s = a;
+				}			
+			}
+		}
+		if(s>-1){
+			k = s;
+			s = -1;
+		}
+		if(fir>1)printf("\n");
+		if(fir==0)printf("SCC%d: vertex %c\n", sccNum++, alpha[k]);
+	}
 }
