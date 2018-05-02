@@ -19,7 +19,7 @@ void printVertexs(vertex* src);
 void dfs_visit(vertex* src);
 
 static vertex** adjList = 0x0;
-static vertex** trsList = 0x0;
+static vertex** trsList = NULL;
 
 int time = 0;
 
@@ -55,11 +55,14 @@ int main(){
 
 	adjList = (vertex**) malloc ( sizeof(vertex*) * num );
 
+
 	trs = (int**) malloc ( sizeof(int*) * num );
 
         for(int i=0; i<num; i++){
                 trs[i] = (int*) malloc ( sizeof(int) * num );
         }
+
+	iter = 0;
 
 	for(int i = 0; i<num; i++)
                 for(int j =0; j < num; j++)
@@ -77,11 +80,12 @@ int main(){
 				}
 				else{
 					adjList[i] = makeEdge(adjList[i], j);
+					first++;
 				}	
 			}
 		}
-		if(adjList[i]->next != NULL)adjList[i] = makeEdge(adjList[i], i);
-		else adjList[i] = createV(i);
+		if(first == 0)adjList[i] = createV(i);
+		else adjList[i] = makeEdge(adjList[i], i);
 	}
 
 	//1) result
@@ -102,13 +106,39 @@ int main(){
 
 	//TODO: 3) Array of adjacency list of transpose graph after step2
 
-	for(int i = 1; i< num; i++){
-		trs[i][adjList[i]->parent->value] = 1;
-		trs[adjList[i]->parent->value][i] = 0;
-	}	
+	for(int i = 0; i< num; i++){
+		if(adjList[i]->parent != NULL){
+			trs[i][adjList[i]->parent->value] = 1;
+			trs[adjList[i]->parent->value][i] = 0;
+		}
+	}
+
+	trsList = (vertex**) malloc ( sizeof(vertex*) * num );
+
+	for(int i = 0; i< num; i++){
+                trsList[i] = (vertex*)malloc(sizeof(vertex));
+                int first = 0;
+                for(int j = num; j>=0; j--){
+                        if(trs[i][j]==1){
+                                if(first == 0){
+                                        trsList[i] = createV(j);
+                                        first++;
+                                }
+                                else{
+                                        trsList[i] = makeEdge(trsList[i], j);
+					first++;
+                                }
+                        }
+                }
+		
+                if(first == 0)trsList[i] = createV(i);
+                else trsList[i] = makeEdge(trsList[i], i);
+        }
 
 	// 3) result
 	printf("3) Array of adjacency list of transpose graph after step2\n");
+	for(int i = 0; i< num; i++)
+                printVertexs(trsList[i]);
 
 	//TODO: 4) Discovery time and finish time of each vertex after step3 
 	
