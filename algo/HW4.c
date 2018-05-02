@@ -5,6 +5,8 @@
 #include <math.h>
 
 typedef struct _vertex {
+	struct _vertex * parent ;
+	char* color;
         int value ;
         int finishTime ;
 	int discoveryTime ;
@@ -14,8 +16,12 @@ typedef struct _vertex {
 vertex* createV(int value);
 vertex* makeEdge(vertex* src, int num);
 void printVertexs(vertex* src);
+void dfs_visit(vertex* src);
 
 static vertex** adjList = 0x0;
+static vertex** trsList = 0x0;
+
+int time = 0;
 
 int main(){
 
@@ -26,6 +32,7 @@ int main(){
 	int num, iter = 0;
 	int data[100] ;
 	int** adj;
+	int** trs;
 
 	while(fscanf(fp, "%s", buf)!=EOF){
 		if(!isalpha(buf[0]))
@@ -35,7 +42,7 @@ int main(){
 
 	num = sqrt(num);
 
-	//TODO: Construct Adj Array and adjacency list in alphabetical order
+	//DONE: Construct Adj Array and adjacency list in alphabetical order
 	adj = (int**) malloc ( sizeof(int*) * num );
 
 	for(int i=0; i<num; i++){
@@ -48,6 +55,17 @@ int main(){
 
 	adjList = (vertex**) malloc ( sizeof(vertex*) * num );
 
+	trs = (int**) malloc ( sizeof(int*) * num );
+
+        for(int i=0; i<num; i++){
+                trs[i] = (int*) malloc ( sizeof(int) * num );
+        }
+
+	for(int i = 0; i<num; i++)
+                for(int j =0; j < num; j++)
+                        trs[i][j] = data[iter++];
+	
+	//DONE: 1) Array of adjacency list of above graph
 	for(int i = 0; i< num; i++){
 		adjList[i] = (vertex*)malloc(sizeof(vertex));
 		int first = 0;
@@ -66,21 +84,40 @@ int main(){
 		else adjList[i] = createV(i);
 	}
 
-	//TODO: 1) Array of adjacency list of above graph
+	//1) result
 	printf("1) Array of adjacency list of above graph\n");
 	for(int i = 0; i< num; i++)
 		printVertexs(adjList[i]);
 	
 	//TODO: 2) Discovery time and finish time of each vertex after step1 
+	for(int i = 0; i< num; i++)
+		if(strcmp(adjList[i]->color, "white")==0)dfs_visit(adjList[i]);
+	
+	//2) result
 	printf("2) Discovery time and finish time of each vertex after step1\n");
+	for(int i = 0; i< num; i++){
+                printf("%c: Discovery Time - %d, Finish Time - %d\n", alpha[adjList[i]->value],adjList[i]->discoveryTime, adjList[i]->finishTime);
+
+	}
 
 	//TODO: 3) Array of adjacency list of transpose graph after step2
+
+	for(int i = 1; i< num; i++){
+		trs[i][adjList[i]->parent->value] = 1;
+		trs[adjList[i]->parent->value][i] = 0;
+	}	
+
+	// 3) result
 	printf("3) Array of adjacency list of transpose graph after step2\n");
 
 	//TODO: 4) Discovery time and finish time of each vertex after step3 
+	
+	// 4) result
 	printf("4) Discovery time and finish time of each vertex after step3\n");
 
 	//TODO: 5) SCC result
+
+	// 5) result
 	printf("5) SCC result\n");
 	
 	
@@ -89,11 +126,12 @@ int main(){
 vertex* createV(int value){
 
 	vertex* newVertex = (vertex*)malloc(sizeof(vertex));
-
         newVertex->value = value;
-	int finishTime = 0 ;
-	int discoveryTime = 0 ;
+	newVertex->color = "white";
+	newVertex->finishTime = 0 ;
+	newVertex->discoveryTime = 0 ;
         newVertex->next = NULL;
+	newVertex->parent = NULL;
 	return newVertex;
 
 }
@@ -101,9 +139,11 @@ vertex* makeEdge(vertex* des, int value){
 
 	vertex* newvertex = (vertex*)malloc(sizeof(vertex));
 	newvertex->value = value;
-	int finishTime = 0 ;
-	int discoveryTime = 0 ;
+	newvertex->color = "white";
+	newvertex->finishTime = 0 ;
+	newvertex->discoveryTime = 0 ;
 	newvertex->next = des;
+	newvertex->parent = NULL;
 	return newvertex;
 }
 void printVertexs(vertex* src){
@@ -114,4 +154,23 @@ void printVertexs(vertex* src){
 		printf("%c -> ", alpha[i->value]) ;
 	printf("nil\n");
 
+}
+void dfs_visit(vertex* src){
+
+	vertex * i;
+
+	adjList[src->value]->color = "gray";
+	adjList[src->value]->discoveryTime = time++;
+	//printf("dis: %d -> %d \n", adjList[src->value]->value, time);
+
+	for (i = src ; i != NULL ; i = i->next){
+		if(strcmp(adjList[i->value]->color, "white")==0){
+			adjList[i->value]->parent = src;
+			dfs_visit(adjList[i->value]);
+		}
+	}
+	adjList[src->value]->color = "black";
+	adjList[src->value]->finishTime = time++;
+	//printf("fin: %d -> %d \n", adjList[src->value]->value, time);
+	
 }
