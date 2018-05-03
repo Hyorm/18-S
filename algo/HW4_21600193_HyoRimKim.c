@@ -27,11 +27,25 @@ int** order;
 
 int time = 0;
 int trsTime = 0;
-int main(){
+
+int main(int argc, char *argv[]){
 
 	char alpha[26] ={'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 
-	FILE* fp = fopen("hw4.data", "r") ;
+	FILE*fp;
+
+	if(argc>1)fp = fopen(argv[1], "r");
+	else if(argc==1)fp = fopen("hw4.data", "r") ;
+	else {
+		printf("file name error --> use default file");
+		fp = fopen("hw4.data", "r") ;
+	}
+
+	if(fp==NULL){
+		printf("file open error\n");
+		exit(1);
+	}	
+
 	char buf[2048] ;
 	int num, iter = 0;
 	int data[100] ;

@@ -1,0 +1,37 @@
+Algorithm Analysis - HW4
+
+Due Date: 2018.05.03 23:50
+
+21600193 Kim Hyo Rim
+
+0. How to compile "HW4_21600193_HyoRimKim.c" source code into an output file
+
+	1) Command
+	$ make
+
+	2) makefile
+
+		hw4: hw4 HW4_21600193_HyoRimKim.o
+		        gcc -o hw4 HW4_21600193_HyoRimKim.o
+		        ./hw4 $(filename)
+		        rm hw4
+		HW4_21600193_HyoRimKim.o: HW4_21600193_HyoRimKim.c
+		        gcc -c HW4_21600193_HyoRimKim.c
+
+		clean: 
+		        rm HW4_21600193_HyoRimKim.o 
+
+	2) input data
+		-dafault file name: hw4.data
+		(If you want use another file, use follow command)
+		-	$ make filename=[another_filename]
+
+1. Result: The program print followings.
+
+	1) Array of adjacency list of above graph
+	2) Discovery time and finish time of each vertex after step1 
+	3) Array of adjacency list of transpose graph after step2
+	4) Discovery time and finish time of each vertex after step3 
+	5) SCC result
+
+	Each result for "hw4.data" can be seen in "HW4_21600193_HyoRimKim.png".
