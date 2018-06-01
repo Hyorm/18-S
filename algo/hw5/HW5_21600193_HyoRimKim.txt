@@ -1,0 +1,28 @@
+Algorithm Analysis - HW5
+
+Due Date: 2018.06.02 00:00
+
+21600193 Kim Hyo Rim
+
+0. How to compile "HW5_21600193_HyoRimKim.c" source code into an output file
+
+	1) Command
+	$ make
+
+	2) makefile
+
+		hw5: hw5 HW5_21600193_HyoRimKim.o
+		        gcc -o hw5 HW5_21600193_HyoRimKim.o
+		        ./hw5 $(filename)
+		        rm hw5
+		HW5_21600193_HyoRimKim.o: HW5_21600193_HyoRimKim.c
+		        gcc -c HW5_21600193_HyoRimKim.c
+
+		clean: 
+		        rm HW5_21600193_HyoRimKim.o 
+
+	2) input data
+		-dafault file name: hw5.data
+		(If you want use another file, use follow command)
+		-	$ make filename=[another_filename]
+
